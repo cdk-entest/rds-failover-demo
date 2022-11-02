@@ -9,7 +9,7 @@ date: 02/11/2022
 ## Introduction
 
 - launch a RDS database instance
-- test connector with credentials from secret manager
+- test connector with credentials from secret manager or config.json
 - read/write iops multi-thread
 - launch a multi-az db and check failover handle
 
@@ -115,3 +115,108 @@ def get_connect():
 ```
 
 then create a table and write/read data using thread
+
+## Insert/Read Employees
+
+create an employee table
+
+```py
+def create_table() -> None:
+    """
+    create a rds table
+    """
+    # get connection
+    conn = get_connect()
+    # cursor
+    cur = conn.cursor()
+    # drop table if exists
+    drop = "DROP TABLE IF EXISTS employees"
+    cur.execute(drop)
+    # create table
+    employee_table = (
+        "CREATE TABLE employees ("
+        "    id VARCHAR(36) UNIQUE, "
+        "    name VARCHAR(200) DEFAULT '' NOT NULL, "
+        "    age INT, "
+        "    time TEXT, "
+        "PRIMARY KEY (id))"
+    )
+    cur.execute(employee_table)
+    cur.close()
+    conn.close()
+```
+
+write some random data to the table
+
+```py
+def write_to_table():
+    """
+    write random data to table
+    """
+    # get connection
+    conn = get_connect()
+    conn.autocommit = True
+    print(f"thread {current_thread().name} connect {conn}")
+    cursor = conn.cursor()
+    print(f"thread {current_thread().name} cursor {cursor}")
+    for k in range(NUM_ROW):
+        print(f"{current_thread().name} insert item {k}")
+        stmt_insert = (
+            "INSERT INTO employees (id, name, age, time) VALUES (%s, %s, %s, %s)"
+        )
+        cursor.execute(
+            stmt_insert,
+            (
+                str(uuid.uuid4()),
+                f"{str(uuid.uuid4())}-{str(uuid.uuid4())}",
+                30,
+                datetime.datetime.now().strftime("%Y-%M-%D-%H-%M-%S"),
+            ),
+        )
+        if k % CHUNK_SIZE == 0:
+            print(f"{current_thread().name} commit chunk {k // CHUNK_SIZE}")
+            conn.commit()
+    # close connection
+    cursor.close()
+    conn.close()
+```
+
+fetch data for the flask web app
+
+```py
+def fetch_data():
+    """
+    create a rds table
+    """
+    # table data
+    employees = []
+    # init
+    outputs = []
+    # connect
+    conn = conect_db()
+    # cursor
+    cur = conn.cursor()
+    # query
+    stmt_select = "SELECT id, name, age, time FROM employees ORDER BY id LIMIT 1000"
+    cur.execute(stmt_select)
+    # parse
+    for row in cur.fetchall():
+        outputs.append(row)
+        print(row)
+
+    # item object
+    for output in outputs:
+        employees.append(Item(output[0], output[1], output[2], output[3]))
+
+    # close connect
+    cur.close()
+    conn.close()
+    # return
+    return ItemTable(employees)
+```
+
+## Test Failover
+
+```bash
+while true; do host database-1.cxa01z0gy4dn.ap-northeast-1.rds.amazonaws.com; sleep 3;  done;
+```
