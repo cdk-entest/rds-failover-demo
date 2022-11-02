@@ -228,5 +228,7 @@ while true; do host database-1.cxa01z0gy4dn.ap-northeast-1.rds.amazonaws.com; sl
 ## Reference
 
 [mysql docs](https://dev.mysql.com/doc/refman/8.0/en/database-use.html)
+
 [aws rds reboot](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_RebootInstance.html)
+
 [rds multi-az cluster](https://aws.amazon.com/blogs/database/readable-standby-instances-in-amazon-rds-multi-az-deployments-a-new-high-availability-option/)
