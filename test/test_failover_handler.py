@@ -59,12 +59,16 @@ def get_connect():
     # get db credentials
     credentials = get_db_credentials_from_sm()
     # connector
-    conn = mysql.connector.connect(
-        host=credentials["host"],
-        user=credentials["username"],
-        password=credentials["password"],
-        database=credentials["dbname"],
-    )
+    try:
+        conn = mysql.connector.connect(
+            host=credentials["host"],
+            user=credentials["username"],
+            password=credentials["password"],
+            database=credentials["dbname"],
+        )
+        print("connected db: {0}".format(conn))
+    except:
+        print("error connect to db")
     return conn
 
 
