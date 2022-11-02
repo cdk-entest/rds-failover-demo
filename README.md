@@ -15,7 +15,6 @@ date: 02/11/2022
 
 ![Untitled Diagram](https://user-images.githubusercontent.com/20411077/199444773-42c3b7b0-2c36-4006-94c8-05b3fbd651f7.png)
 
-
 ## Install DB CLI
 
 ```bash
@@ -220,6 +219,14 @@ def fetch_data():
 
 ## Test Failover
 
+you will see DNS of the database endpoint changes after reboot (click the failover box and rds multi-az assumed enlabed before)
+
 ```bash
 while true; do host database-1.cxa01z0gy4dn.ap-northeast-1.rds.amazonaws.com; sleep 3;  done;
 ```
+
+## Reference
+
+[mysql docs](https://dev.mysql.com/doc/refman/8.0/en/database-use.html)
+[aws rds reboot](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_RebootInstance.html)
+[rds multi-az cluster](https://aws.amazon.com/blogs/database/readable-standby-instances-in-amazon-rds-multi-az-deployments-a-new-high-availability-option/)
