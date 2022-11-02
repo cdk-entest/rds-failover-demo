@@ -65,7 +65,7 @@ def fetch_data():
     # cursor
     cur = conn.cursor()
     # query
-    stmt_select = "SELECT id, name, age, time FROM employees ORDER BY id"
+    stmt_select = "SELECT id, name, age, time FROM employees ORDER BY id LIMIT 10000"
     cur.execute(stmt_select)
     # parse
     for row in cur.fetchall():
