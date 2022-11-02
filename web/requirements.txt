@@ -1,0 +1,5 @@
+boto3
+names 
+Flask
+Flask-Table
+mysql-connector-python
