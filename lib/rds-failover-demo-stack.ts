@@ -181,6 +181,6 @@ export class WebServerStack extends Stack {
     });
 
     // add user data for ec2
-    // ec2.addUserData(fs.readFileSync("./lib/user-data.sh", "utf8"));
+    ec2.addUserData(fs.readFileSync("./lib/user-data.sh", "utf8"));
   }
 }
