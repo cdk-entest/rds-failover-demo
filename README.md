@@ -13,6 +13,9 @@ date: 02/11/2022
 - read/write iops multi-thread
 - launch a multi-az db and check failover handle
 
+![Untitled Diagram](https://user-images.githubusercontent.com/20411077/199444773-42c3b7b0-2c36-4006-94c8-05b3fbd651f7.png)
+
+
 ## Install DB CLI
 
 ```bash
