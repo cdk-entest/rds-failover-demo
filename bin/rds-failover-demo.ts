@@ -10,10 +10,10 @@ import {
 const app = new cdk.App();
 
 // network stack
-const networkStack = new NetworkStack(app, "NetworkStack", {
+const networkStack = new NetworkStack(app, "NetworkStackRds", {
   cidr: "172.16.0.0/20",
   env: {
-    region: "ap-northeast-1",
+    region: "ap-southeast-2",
     account: process.env.CDK_DEFAULT_ACCOUNT,
   },
 });
@@ -21,7 +21,7 @@ const networkStack = new NetworkStack(app, "NetworkStack", {
 // role for ec2 webserver
 const roleStack = new RoleForEc2(app, "RoleForEc2Stack", {
   env: {
-    region: "ap-northeast-1",
+    region: "ap-southeast-2",
     account: process.env.CDK_DEFAULT_ACCOUNT,
   },
 });
@@ -31,7 +31,7 @@ const databaseStack = new DatabaseStack(app, "DatabaseStack", {
   vpc: networkStack.vpc,
   sg: networkStack.databaseSG,
   env: {
-    region: "ap-northeast-1",
+    region: "ap-southeast-2",
     account: process.env.CDK_DEFAULT_ACCOUNT,
   },
 });
@@ -42,7 +42,7 @@ const webServerStack = new WebServerStack(app, "WebServerStack", {
   sg: networkStack.webServerSG,
   role: roleStack.role,
   env: {
-    region: "ap-northeast-1",
+    region: "ap-southeast-2",
     account: process.env.CDK_DEFAULT_ACCOUNT,
   },
 });

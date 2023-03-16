@@ -85,6 +85,8 @@ export class DatabaseStack extends Stack {
     new aws_rds.DatabaseInstance(this, "RdsDatabaseInstance", {
       databaseName: "covid",
       deletionProtection: false,
+      // enable multiAz so there is a standby one 
+      multiAz: true, 
       engine: aws_rds.DatabaseInstanceEngine.mysql({
         version: aws_rds.MysqlEngineVersion.VER_8_0_23,
       }),

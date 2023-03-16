@@ -8,12 +8,108 @@ date: 02/11/2022
 
 ## Introduction
 
+[Github](https://github.com/cdk-entest/rds-failover-demo) shows basics of AWS RDS
+
 - launch a RDS database instance
 - test connector with credentials from secret manager or config.json
 - read/write iops multi-thread
 - launch a multi-az db and check failover handle
+- please ensure having enough EIP address before deploy cdk 
 
 ![Untitled Diagram](https://user-images.githubusercontent.com/20411077/199444773-42c3b7b0-2c36-4006-94c8-05b3fbd651f7.png)
+
+## Create VPC 
+
+- create a vpc with at least two AZs 
+- one public, private, isolated subnet per each zone 
+- create security groups for rds 
+
+```ts 
+this.vpc = new aws_ec2.Vpc(this, "FabbiVpc", {
+  vpcName: "fabbi",
+  maxAzs: 2,
+  cidr: props.cidr,
+  subnetConfiguration: [
+    {
+      name: "public",
+      subnetType: aws_ec2.SubnetType.PUBLIC,
+      cidrMask: 24,
+    },
+    {
+      name: "private-nat",
+      subnetType: aws_ec2.SubnetType.PRIVATE_WITH_NAT,
+      cidrMask: 24,
+    },
+    {
+      name: "private-isolated",
+      subnetType: aws_ec2.SubnetType.PRIVATE_ISOLATED,
+      cidrMask: 24,
+    },
+  ],
+});
+```
+
+create a security group for rds 
+
+```ts 
+const databaseSG = new aws_ec2.SecurityGroup(this, "DbSecurityGroup", {
+  securityGroupName: "DbSecurityGroup",
+  vpc: this.vpc,
+});
+databaseSG.addIngressRule(
+  aws_ec2.Peer.securityGroupId(webServerSG.securityGroupId),
+  aws_ec2.Port.tcp(3306)
+);
+databaseSG.addIngressRule(
+  aws_ec2.Peer.securityGroupId(webServerSG.securityGroupId),
+  aws_ec2.Port.tcp(1403)
+);
+```
+
+create webserver security group 
+
+```ts 
+const webServerSG = new aws_ec2.SecurityGroup(
+  this,
+  "WebServerSecurityGroup",
+  {
+    securityGroupName: "WebServerSecurityGroup",
+    vpc: this.vpc,
+  }
+);
+```
+
+## Create a RDS 
+
+- enable multi-az so there is a standby instance in another zone 
+
+```ts 
+new aws_rds.DatabaseInstance(this, "RdsDatabaseInstance", {
+  databaseName: "covid",
+  deletionProtection: false,
+  // enable multiAz so there is a standby one 
+  multiAz: true, 
+  engine: aws_rds.DatabaseInstanceEngine.mysql({
+    version: aws_rds.MysqlEngineVersion.VER_8_0_23,
+  }),
+  vpc: props.vpc,
+  port: 3306,
+  instanceType: aws_ec2.InstanceType.of(
+    aws_ec2.InstanceClass.BURSTABLE3,
+    aws_ec2.InstanceSize.MEDIUM
+  ),
+  credentials: aws_rds.Credentials.fromGeneratedSecret("admin", {
+    secretName: "rds-secrete-name",
+  }),
+  iamAuthentication: false,
+  removalPolicy: RemovalPolicy.DESTROY,
+  securityGroups: [props.sg],
+  storageEncrypted: false,
+  vpcSubnets: {
+    subnetType: aws_ec2.SubnetType.PRIVATE_WITH_NAT,
+  },
+});
+```
 
 ## Install DB CLI
 
