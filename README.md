@@ -14,17 +14,17 @@ date: 02/11/2022
 - test connector with credentials from secret manager or config.json
 - read/write iops multi-thread
 - launch a multi-az db and check failover handle
-- please ensure having enough EIP address before deploy cdk 
+- please ensure having enough EIP address before deploy cdk
 
 ![Untitled Diagram](https://user-images.githubusercontent.com/20411077/199444773-42c3b7b0-2c36-4006-94c8-05b3fbd651f7.png)
 
-## Create VPC 
+## Create VPC
 
-- create a vpc with at least two AZs 
-- one public, private, isolated subnet per each zone 
-- create security groups for rds 
+- create a vpc with at least two AZs
+- one public, private, isolated subnet per each zone
+- create security groups for rds
 
-```ts 
+```ts
 this.vpc = new aws_ec2.Vpc(this, "FabbiVpc", {
   vpcName: "fabbi",
   maxAzs: 2,
@@ -49,9 +49,9 @@ this.vpc = new aws_ec2.Vpc(this, "FabbiVpc", {
 });
 ```
 
-create a security group for rds 
+create a security group for rds
 
-```ts 
+```ts
 const databaseSG = new aws_ec2.SecurityGroup(this, "DbSecurityGroup", {
   securityGroupName: "DbSecurityGroup",
   vpc: this.vpc,
@@ -66,29 +66,25 @@ databaseSG.addIngressRule(
 );
 ```
 
-create webserver security group 
+create webserver security group
 
-```ts 
-const webServerSG = new aws_ec2.SecurityGroup(
-  this,
-  "WebServerSecurityGroup",
-  {
-    securityGroupName: "WebServerSecurityGroup",
-    vpc: this.vpc,
-  }
-);
+```ts
+const webServerSG = new aws_ec2.SecurityGroup(this, "WebServerSecurityGroup", {
+  securityGroupName: "WebServerSecurityGroup",
+  vpc: this.vpc,
+});
 ```
 
-## Create a RDS 
+## Create a RDS
 
-- enable multi-az so there is a standby instance in another zone 
+- enable multi-az so there is a standby instance in another zone
 
-```ts 
+```ts
 new aws_rds.DatabaseInstance(this, "RdsDatabaseInstance", {
   databaseName: "covid",
   deletionProtection: false,
-  // enable multiAz so there is a standby one 
-  multiAz: true, 
+  // enable multiAz so there is a standby one
+  multiAz: true,
   engine: aws_rds.DatabaseInstanceEngine.mysql({
     version: aws_rds.MysqlEngineVersion.VER_8_0_23,
   }),
@@ -323,8 +319,7 @@ while true; do host database-1.cxa01z0gy4dn.ap-northeast-1.rds.amazonaws.com; sl
 
 ## Reference
 
-[mysql docs](https://dev.mysql.com/doc/refman/8.0/en/database-use.html)
-
-[aws rds reboot](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_RebootInstance.html)
-
-[rds multi-az cluster](https://aws.amazon.com/blogs/database/readable-standby-instances-in-amazon-rds-multi-az-deployments-a-new-high-availability-option/)
+- [rds under the hood](https://aws.amazon.com/blogs/database/amazon-rds-under-the-hood-multi-az/)
+- [mysql docs](https://dev.mysql.com/doc/refman/8.0/en/database-use.html)
+- [aws rds reboot](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_RebootInstance.html)
+- [rds multi-az cluster](https://aws.amazon.com/blogs/database/readable-standby-instances-in-amazon-rds-multi-az-deployments-a-new-high-availability-option/)
