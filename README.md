@@ -311,6 +311,12 @@ def fetch_data():
 
 ## Test Failover
 
+connect and play with the database 
+
+```bash 
+mysql --host=$host --user=$user --password=$password
+```
+
 you will see DNS of the database endpoint changes after reboot (click the failover box and rds multi-az assumed enlabed before)
 
 ```bash
