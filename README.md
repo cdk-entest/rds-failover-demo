@@ -311,9 +311,9 @@ def fetch_data():
 
 ## Test Failover
 
-connect and play with the database 
+connect and play with the database
 
-```bash 
+```bash
 mysql --host=$host --user=$user --password=$password
 ```
 
@@ -322,6 +322,13 @@ you will see DNS of the database endpoint changes after reboot (click the failov
 ```bash
 while true; do host database-1.cxa01z0gy4dn.ap-northeast-1.rds.amazonaws.com; sleep 3;  done;
 ```
+
+## Run WebServer
+
+- clone or download the [git repository](https://github.com/cdk-entest/rds-failover-demo)
+- check the secret name in test_basic_db_connect.py
+- run test_basic_db_connect.py to get config => create table => write data
+- run the app.y web server
 
 ## Reference
 
