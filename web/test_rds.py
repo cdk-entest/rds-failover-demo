@@ -57,7 +57,7 @@ def create_table() -> None:
     # create table
     employee_table = (
         "CREATE TABLE employees ("
-        "    id TINYINT UNSIGNED NOT NULL AUTO_INCREMENT, "
+        "    id INT UNSIGNED NOT NULL AUTO_INCREMENT, "
         "    name VARCHAR(30) DEFAULT '' NOT NULL, "
         "    age TEXT, "
         "    time TEXT, "
