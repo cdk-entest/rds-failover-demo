@@ -7,7 +7,7 @@ Hello Aurora RDS
 4. insert datat into tables 
 5. query 
 """
-
+import os 
 import datetime
 import mysql.connector
 import boto3
@@ -15,17 +15,21 @@ import json
 import names
 import random
 
-# scret manager => better in environment vars
-SECRET_ID = "rds-secrete-name"
-# region
-REGION = "ap-northeast-1"
+# get region and secrete from enviornment variables 
+try:
+    SECRET_ID = os.environ["SECRET_ID"]
+except: 
+    SECRET_ID = "rds-secrete-name"
+
+try:
+    REGION = os.environ["REGION"]
+except: 
+    REGION = "ap-southeast-1"
 
 # sm client
 secrete_client = boto3.client("secretsmanager", region_name=REGION)
-
 # get secret string
 secret = secrete_client.get_secret_value(SecretId=SECRET_ID)
-
 # parse db information
 secret_dic = json.loads(secret["SecretString"])
 print(secret_dic)

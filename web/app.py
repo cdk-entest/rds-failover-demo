@@ -1,13 +1,23 @@
+# haimtran 06/07/2023
+# test
+
+import os
 import mysql.connector
 import boto3
 import json
 from flask import Flask, render_template
 from flask_table import Table, Col
 
-# scret manager => better in environment vars
-SECRET_ID = "rds-secrete-name"
-# region
-REGION = "ap-northeast-1"
+# get region and secrete from enviornment variables 
+try:
+    SECRET_ID = os.environ["SECRET_ID"]
+except: 
+    SECRET_ID = "rds-secrete-name"
+
+try:
+    REGION = os.environ["REGION"]
+except: 
+    REGION = "ap-southeast-1"
 
 class ItemTable(Table):
     """ """
