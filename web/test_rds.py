@@ -1,12 +1,10 @@
-"""
-Hello Aurora RDS 
-0. check aurora security group allow EC2 from this vscode "sg-0e936e710434472f5"
-1. create a connector 
-2. create tables 
-3. show tables
-4. insert datat into tables 
-5. query 
-"""
+# ===============================================================
+# author: haimtran  | created date: 06/06/2023
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+# update 1          | created date: 06/07/2023
+# get secrete and region from environment variables
+# ===============================================================
+
 import os 
 import datetime
 import mysql.connector

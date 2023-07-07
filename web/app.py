@@ -1,6 +1,10 @@
-# haimtran 06/07/2023
-# test
 
+# ===============================================================
+# author: haimtran  | created date: 06/06/2023
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+# update 1          | created date: 06/07/2023
+# get secrete and region from environment variables
+# ===============================================================
 import os
 import mysql.connector
 import boto3
