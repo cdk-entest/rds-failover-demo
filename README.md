@@ -330,7 +330,28 @@ while true; do host database-1.cxa01z0gy4dn.ap-northeast-1.rds.amazonaws.com; sl
 - run test_basic_db_connect.py to get config => create table => write data
 - run the app.y web server
 
-## Troubleshooting 
+Please check and update the environment variables in user data before running
+
+```bash
+# set environment variables
+export REGION=ap-southeast-1
+export SECRET_ID=rds-secrete-name
+# install packages
+yum install -y mariadb
+# download repository
+wget https://github.com/cdk-entest/rds-failover-demo/archive/refs/heads/main.zip
+unzip main.zip
+cd rds-failover-demo-main
+# install dependencies
+python3 -m pip install -r requirements.txt
+cd web
+# create table and data to database
+python3 test_rds.py
+# run the flask app
+python3 -m app
+```
+
+## Troubleshooting
 
 When using CDK to look up supporting mysql rds version, please check form the docs [here](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/MySQL.Concepts.VersionMgmt.html)
 
