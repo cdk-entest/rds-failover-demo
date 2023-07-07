@@ -2,6 +2,7 @@
 haimtran basic rds db connect
 02/11/2022
 """
+import os 
 import datetime
 import json
 import uuid
@@ -11,12 +12,19 @@ from threading import current_thread
 import mysql.connector
 import boto3
 
-# region
-REGION = "ap-northeast-1"
-# secrete manager
-SECRET_ID = "rds-secrete-name"
+# get region and secrete from enviornment variables 
+try:
+    SECRET_ID = os.environ["SECRET_ID"]
+except: 
+    SECRET_ID = "rds-secrete-name"
+
+try:
+    REGION = os.environ["REGION"]
+except: 
+    REGION = "ap-southeast-1"
+
 # set log level
-logger.basicConfig(level=logger.DEBUG)
+# logger.basicConfig(level=logger.DEBUG)
 # parameter for thread
 NUM_ROW = 10000
 CHUNK_SIZE = 100
@@ -58,6 +66,7 @@ def get_connect():
     """
     # get db credentials
     credentials = get_db_credentials_from_sm()
+    # credentials = get_db_credentials_from_config()
     # connector
     conn = mysql.connector.connect(
         host=credentials["host"],
@@ -150,7 +159,9 @@ def write_to_table():
 
 
 if __name__ == "__main__":
+    # get_db_credentials_from_config()
     # get_db_credentials_from_sm()
     # get_connect()
-    # create_table()
-    fetch_data()
+    create_table()
+    # write_to_table()
+    # fetch_data()

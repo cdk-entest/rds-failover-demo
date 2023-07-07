@@ -2,16 +2,24 @@
 haimtran basic rds db connect
 02/11/2022
 """
+import os
 import time
 from datetime import datetime
 import json
 import mysql.connector
 import boto3
 
-# region
-REGION = "ap-northeast-1"
-# secrete manager
-SECRET_ID = "rds-secrete-name"
+# get region and secrete from enviornment variables 
+try:
+    SECRET_ID = os.environ["SECRET_ID"]
+except: 
+    SECRET_ID = "rds-secrete-name"
+
+try:
+    REGION = os.environ["REGION"]
+except: 
+    REGION = "ap-southeast-1"
+
 # parameter for thread
 NUM_ROW = 10000
 CHUNK_SIZE = 100

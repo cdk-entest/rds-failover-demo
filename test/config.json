@@ -1,6 +1,6 @@
 {
-  "host": "database-1.cxa01z0gy4dn.ap-northeast-1.rds.amazonaws.com",
+  "host": "database-1.c3x7jlemonqv.ap-southeast-1.rds.amazonaws.com",
   "username": "admin",
-  "password": "Admin123456",
+  "password": "admin1234",
   "dbname":"covid"
 }

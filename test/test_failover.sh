@@ -1,1 +1,1 @@
-while true; do host database-1.cxa01z0gy4dn.ap-northeast-1.rds.amazonaws.com; sleep 3;  done;
+while true; do host database-1.c3x7jlemonqv.ap-southeast-1.rds.amazonaws.com; sleep 3;  done;
