@@ -330,9 +330,18 @@ while true; do host database-1.cxa01z0gy4dn.ap-northeast-1.rds.amazonaws.com; sl
 - run test_basic_db_connect.py to get config => create table => write data
 - run the app.y web server
 
+## Troubleshooting 
+
+When using CDK to look up supporting mysql rds version, please check form the docs [here](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/MySQL.Concepts.VersionMgmt.html)
+
 ## Reference
 
 - [rds under the hood](https://aws.amazon.com/blogs/database/amazon-rds-under-the-hood-multi-az/)
+
 - [mysql docs](https://dev.mysql.com/doc/refman/8.0/en/database-use.html)
+
 - [aws rds reboot](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_RebootInstance.html)
+
 - [rds multi-az cluster](https://aws.amazon.com/blogs/database/readable-standby-instances-in-amazon-rds-multi-az-deployments-a-new-high-availability-option/)
+
+- [rds version support](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/MySQL.Concepts.VersionMgmt.html)
