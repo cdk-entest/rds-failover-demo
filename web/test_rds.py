@@ -24,6 +24,8 @@ try:
 except: 
     REGION = "ap-southeast-1"
 
+# number of random employees 
+NUM_EMPLOYEE = 10000
 # sm client
 secrete_client = boto3.client("secretsmanager", region_name=REGION)
 # get secret string
@@ -68,7 +70,7 @@ def create_table() -> None:
     # employees (id, name, age, time)
     employees = [
         (k, names.get_full_name(), random.randint(20, 100), time_stamp)
-        for k in range(1, 100)
+        for k in range(1, NUM_EMPLOYEE)
     ]
     # tuple
     employees = tuple(employees)
