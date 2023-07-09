@@ -1,6 +1,8 @@
 # set environment variables 
 export REGION=ap-southeast-1
 export SECRET_ID=rds-secrete-name
+# vim configuration 
+wget -O ~/.vimrc https://github.com/cdk-entest/basic-vim/blob/main/.vimrc
 # install packages 
 yum install -y mariadb
 # download repository
