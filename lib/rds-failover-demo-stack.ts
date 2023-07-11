@@ -5,6 +5,7 @@ import {
   Stack,
   StackProps,
   aws_iam,
+  Duration,
 } from "aws-cdk-lib";
 import { Construct } from "constructs";
 import * as fs from "fs";
@@ -16,6 +17,7 @@ export class NetworkStack extends Stack {
   public readonly vpc: aws_ec2.Vpc;
   public readonly databaseSG: aws_ec2.SecurityGroup;
   public readonly webServerSG: aws_ec2.SecurityGroup;
+  public readonly replicaSG: aws_ec2.SecurityGroup;
 
   constructor(scope: Construct, id: string, props: NetworkProps) {
     super(scope, id, props);
@@ -69,26 +71,43 @@ export class NetworkStack extends Stack {
       aws_ec2.Port.tcp(1403)
     );
 
+    // database read replica security group
+    const replicaSG = new aws_ec2.SecurityGroup(
+      this,
+      "DbReplicaSecurityGroup",
+      {
+        securityGroupName: "DbReplicaSecurityGroup",
+        vpc: this.vpc,
+      }
+    );
+
+    replicaSG.addIngressRule(aws_ec2.Peer.anyIpv4(), aws_ec2.Port.tcp(3306));
+    replicaSG.addIngressRule(aws_ec2.Peer.anyIpv4(), aws_ec2.Port.tcp(1403));
+
     this.databaseSG = databaseSG;
     this.webServerSG = webServerSG;
+    this.replicaSG = replicaSG;
   }
 }
 
 interface DatabaseProps extends StackProps {
   vpc: aws_ec2.Vpc;
-  sg: aws_ec2.SecurityGroup;
+  dbSG: aws_ec2.SecurityGroup;
+  replicaSG: aws_ec2.SecurityGroup;
 }
 export class DatabaseStack extends Stack {
   constructor(scope: Construct, id: string, props: DatabaseProps) {
     super(scope, id, props);
 
-    new aws_rds.DatabaseInstance(this, "RdsDatabaseInstance", {
+    const db = new aws_rds.DatabaseInstance(this, "RdsDatabaseInstance", {
       databaseName: "covid",
       deletionProtection: false,
-      // enable multiAz so there is a standby one 
-      multiAz: true, 
+      // enable multiAz so there is a standby one
+      multiAz: true,
       engine: aws_rds.DatabaseInstanceEngine.mysql({
-        version: aws_rds.MysqlEngineVersion.VER_8_0_23,
+        // version depends on region
+        //version: aws_rds.MysqlEngineVersion.VER_8_0_23,
+        version: aws_rds.MysqlEngineVersion.VER_8_0_28,
       }),
       vpc: props.vpc,
       port: 3306,
@@ -101,12 +120,37 @@ export class DatabaseStack extends Stack {
       }),
       iamAuthentication: false,
       removalPolicy: RemovalPolicy.DESTROY,
-      securityGroups: [props.sg],
+      securityGroups: [props.dbSG],
       storageEncrypted: false,
       vpcSubnets: {
         subnetType: aws_ec2.SubnetType.PRIVATE_WITH_NAT,
       },
     });
+
+    // const replica = new aws_rds.DatabaseInstanceReadReplica(
+    //   this,
+    //   "DatabaseInstanceReadReplicaDemo",
+    //   {
+    //     sourceDatabaseInstance: db,
+    //     instanceType: aws_ec2.InstanceType.of(
+    //       aws_ec2.InstanceClass.BURSTABLE2,
+    //       aws_ec2.InstanceSize.MEDIUM
+    //     ),
+    //     vpc: props.vpc,
+    //     removalPolicy: RemovalPolicy.DESTROY,
+    //     securityGroups: [props.replicaSG],
+    //     port: 3306,
+    //     vpcSubnets: {
+    //       subnetType: aws_ec2.SubnetType.PUBLIC,
+    //     },
+    //     storageEncrypted: false,
+    //     backupRetention: Duration.days(7),
+    //     deleteAutomatedBackups: true,
+    //     deletionProtection: false,
+    //     publiclyAccessible: true,
+    //     // availabilityZone: ""
+    //   }
+    // );
   }
 }
 

@@ -7,13 +7,16 @@ import {
   WebServerStack,
 } from "../lib/rds-failover-demo-stack";
 
+//
+const REGION: string = "us-east-2";
+
 const app = new cdk.App();
 
 // network stack
 const networkStack = new NetworkStack(app, "NetworkStackRds", {
   cidr: "172.16.0.0/20",
   env: {
-    region: "ap-southeast-2",
+    region: REGION,
     account: process.env.CDK_DEFAULT_ACCOUNT,
   },
 });
@@ -21,7 +24,7 @@ const networkStack = new NetworkStack(app, "NetworkStackRds", {
 // role for ec2 webserver
 const roleStack = new RoleForEc2(app, "RoleForEc2Stack", {
   env: {
-    region: "ap-southeast-2",
+    region: REGION,
     account: process.env.CDK_DEFAULT_ACCOUNT,
   },
 });
@@ -29,9 +32,10 @@ const roleStack = new RoleForEc2(app, "RoleForEc2Stack", {
 // database
 const databaseStack = new DatabaseStack(app, "DatabaseStack", {
   vpc: networkStack.vpc,
-  sg: networkStack.databaseSG,
+  dbSG: networkStack.databaseSG,
+  replicaSG: networkStack.replicaSG,
   env: {
-    region: "ap-southeast-2",
+    region: REGION,
     account: process.env.CDK_DEFAULT_ACCOUNT,
   },
 });
@@ -42,7 +46,7 @@ const webServerStack = new WebServerStack(app, "WebServerStack", {
   sg: networkStack.webServerSG,
   role: roleStack.role,
   env: {
-    region: "ap-southeast-2",
+    region: REGION,
     account: process.env.CDK_DEFAULT_ACCOUNT,
   },
 });

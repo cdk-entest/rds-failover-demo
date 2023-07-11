@@ -66,6 +66,18 @@ databaseSG.addIngressRule(
 );
 ```
 
+create security group for the database read replica with internet facing
+
+```ts
+const replicaSG = new aws_ec2.SecurityGroup(this, "DbReplicaSecurityGroup", {
+  securityGroupName: "DbReplicaSecurityGroup",
+  vpc: this.vpc,
+});
+
+replicaSG.addIngressRule(aws_ec2.Peer.anyIpv4(), aws_ec2.Port.tcp(3306));
+replicaSG.addIngressRule(aws_ec2.Peer.anyIpv4(), aws_ec2.Port.tcp(1403));
+```
+
 create webserver security group
 
 ```ts
@@ -75,9 +87,9 @@ const webServerSG = new aws_ec2.SecurityGroup(this, "WebServerSecurityGroup", {
 });
 ```
 
-## Create a RDS
+## Multi-AZ RDS
 
-- enable multi-az so there is a standby instance in another zone
+Enable multi-az so there is a standby instance in another zone
 
 ```ts
 new aws_rds.DatabaseInstance(this, "RdsDatabaseInstance", {
@@ -105,6 +117,37 @@ new aws_rds.DatabaseInstance(this, "RdsDatabaseInstance", {
     subnetType: aws_ec2.SubnetType.PRIVATE_WITH_NAT,
   },
 });
+```
+
+## Read Replica
+
+Let create a read replica for performance purpose
+
+```ts
+const replica = new aws_rds.DatabaseInstanceReadReplica(
+  this,
+  "DatabaseInstanceReadReplicaDemo",
+  {
+    sourceDatabaseInstance: db,
+    instanceType: aws_ec2.InstanceType.of(
+      aws_ec2.InstanceClass.BURSTABLE2,
+      aws_ec2.InstanceSize.MEDIUM
+    ),
+    vpc: props.vpc,
+    removalPolicy: RemovalPolicy.DESTROY,
+    securityGroups: [props.replicaSG],
+    port: 3306,
+    vpcSubnets: {
+      subnetType: aws_ec2.SubnetType.PUBLIC,
+    },
+    storageEncrypted: false,
+    backupRetention: Duration.days(7),
+    deleteAutomatedBackups: true,
+    deletionProtection: false,
+    publiclyAccessible: true,
+    // availabilityZone: ""
+  }
+);
 ```
 
 ## Install DB CLI
@@ -366,3 +409,7 @@ When using CDK to look up supporting mysql rds version, please check form the do
 - [rds multi-az cluster](https://aws.amazon.com/blogs/database/readable-standby-instances-in-amazon-rds-multi-az-deployments-a-new-high-availability-option/)
 
 - [rds version support](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/MySQL.Concepts.VersionMgmt.html)
+
+- [rds proxy spinning troubleshooting](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/rds-proxy.troubleshooting.html)
+
+- [rds proxy lambda example](https://aws.amazon.com/blogs/compute/using-amazon-rds-proxy-with-aws-lambda/)
