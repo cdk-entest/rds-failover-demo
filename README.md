@@ -253,7 +253,7 @@ def get_connect():
 
 then create a table and write/read data using thread
 
-## Insert/Read Employees
+## Employees Table
 
 create an employee table
 
@@ -379,6 +379,8 @@ Please check and update the environment variables in user data before running
 # set environment variables
 export REGION=ap-southeast-1
 export SECRET_ID=rds-secrete-name
+# vim configuration
+wget -O ~/.vimrc https://raw.githubusercontent.com/cdk-entest/basic-vim/main/.vimrc
 # install packages
 yum install -y mariadb
 # download repository
@@ -412,4 +414,4 @@ When using CDK to look up supporting mysql rds version, please check form the do
 
 - [rds proxy spinning troubleshooting](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/rds-proxy.troubleshooting.html)
 
-- [rds proxy lambda example](https://aws.amazon.com/blogs/compute/using-amazon-rds-proxy-with-aws-lambda/)
+- [example pymysql proxy](https://github.com/MbuguaFrancis/rds-proxy-python-lambda/tree/master)
