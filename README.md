@@ -413,6 +413,13 @@ python3 -m app
 
 When using CDK to look up supporting mysql rds version, please check form the docs [here](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/MySQL.Concepts.VersionMgmt.html)
 
+
+Find process running on port and cancel 
+
+```bash 
+
+```
+
 ## Reference
 
 - [rds under the hood](https://aws.amazon.com/blogs/database/amazon-rds-under-the-hood-multi-az/)

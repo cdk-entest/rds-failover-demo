@@ -22,7 +22,7 @@ except:
 try:
     REGION = os.environ["REGION"]
 except: 
-    REGION = "us-east-2"
+    REGION = "ap-southeast-1"
 
 # number of random employees 
 NUM_EMPLOYEE = 10000
