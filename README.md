@@ -172,10 +172,23 @@ show databases
 show databases
 ```
 
+use a database
+
+```bash
+use covid
+```
+
+show table inside a database
+
+```bash
+select * from employee
+```
+
 create a table
 
 ```bash
-
+DROP TABLE IF EXISTS employee;
+CREATE TABLE employees(a int);
 ```
 
 insert data into a table
