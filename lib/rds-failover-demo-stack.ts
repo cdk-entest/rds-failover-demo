@@ -22,8 +22,8 @@ export class NetworkStack extends Stack {
   constructor(scope: Construct, id: string, props: NetworkProps) {
     super(scope, id, props);
 
-    this.vpc = new aws_ec2.Vpc(this, "FabbiVpc", {
-      vpcName: "fabbi",
+    this.vpc = new aws_ec2.Vpc(this, "NICVVpc", {
+      vpcName: "NICV",
       maxAzs: 2,
       cidr: props.cidr,
       subnetConfiguration: [
@@ -45,6 +45,23 @@ export class NetworkStack extends Stack {
       ],
     });
 
+    // vpc endpoint for secret manager
+    // this.vpc.addInterfaceEndpoint("SecreteManagerVpcEndpoint", {
+    //   service: aws_ec2.InterfaceVpcEndpointAwsService.SECRETS_MANAGER,
+    //   privateDnsEnabled: true,
+    //   subnets: {
+    //     subnetType: aws_ec2.SubnetType.PRIVATE_ISOLATED,
+    //   },
+    // });
+
+    this.vpc.addInterfaceEndpoint("SecreteManagerVpcEndpoint", {
+      service: aws_ec2.InterfaceVpcEndpointAwsService.SECRETS_MANAGER,
+      privateDnsEnabled: true,
+      subnets: {
+        subnetType: aws_ec2.SubnetType.PRIVATE_WITH_NAT,
+      },
+    });
+
     // security group for webserver
     const webServerSG = new aws_ec2.SecurityGroup(
       this,
@@ -62,14 +79,21 @@ export class NetworkStack extends Stack {
       securityGroupName: "DbSecurityGroup",
       vpc: this.vpc,
     });
+
+    // open 3306 for web server
     databaseSG.addIngressRule(
       aws_ec2.Peer.securityGroupId(webServerSG.securityGroupId),
       aws_ec2.Port.tcp(3306)
     );
+
+    // open 1403 for web server
     databaseSG.addIngressRule(
       aws_ec2.Peer.securityGroupId(webServerSG.securityGroupId),
       aws_ec2.Port.tcp(1403)
     );
+
+    // self reference security group
+    databaseSG.addIngressRule(databaseSG, aws_ec2.Port.tcp(1403));
 
     // database read replica security group
     const replicaSG = new aws_ec2.SecurityGroup(
@@ -127,30 +151,30 @@ export class DatabaseStack extends Stack {
       },
     });
 
-    // const replica = new aws_rds.DatabaseInstanceReadReplica(
-    //   this,
-    //   "DatabaseInstanceReadReplicaDemo",
-    //   {
-    //     sourceDatabaseInstance: db,
-    //     instanceType: aws_ec2.InstanceType.of(
-    //       aws_ec2.InstanceClass.BURSTABLE2,
-    //       aws_ec2.InstanceSize.MEDIUM
-    //     ),
-    //     vpc: props.vpc,
-    //     removalPolicy: RemovalPolicy.DESTROY,
-    //     securityGroups: [props.replicaSG],
-    //     port: 3306,
-    //     vpcSubnets: {
-    //       subnetType: aws_ec2.SubnetType.PUBLIC,
-    //     },
-    //     storageEncrypted: false,
-    //     backupRetention: Duration.days(7),
-    //     deleteAutomatedBackups: true,
-    //     deletionProtection: false,
-    //     publiclyAccessible: true,
-    //     // availabilityZone: ""
-    //   }
-    // );
+    const replica = new aws_rds.DatabaseInstanceReadReplica(
+      this,
+      "DatabaseInstanceReadReplicaDemo",
+      {
+        sourceDatabaseInstance: db,
+        instanceType: aws_ec2.InstanceType.of(
+          aws_ec2.InstanceClass.BURSTABLE2,
+          aws_ec2.InstanceSize.MEDIUM
+        ),
+        vpc: props.vpc,
+        removalPolicy: RemovalPolicy.DESTROY,
+        securityGroups: [props.replicaSG],
+        port: 3306,
+        vpcSubnets: {
+          subnetType: aws_ec2.SubnetType.PUBLIC,
+        },
+        storageEncrypted: false,
+        backupRetention: Duration.days(7),
+        deleteAutomatedBackups: true,
+        deletionProtection: false,
+        publiclyAccessible: true,
+        // availabilityZone: ""
+      }
+    );
   }
 }
 

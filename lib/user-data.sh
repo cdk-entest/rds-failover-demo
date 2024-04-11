@@ -1,3 +1,4 @@
+#!/bin/bash
 # set environment variables 
 export REGION=ap-southeast-1
 export SECRET_ID=rds-secrete-name
